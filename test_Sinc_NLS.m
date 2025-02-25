@@ -1,6 +1,54 @@
+% MATLAB example for Quadratic Least Squares for peak detection
+% MATLAB code for High Precision Clock Synchronization using Sinc-NLS (without fminunc)
+% MATLAB code for High Precision Clock Synchronization using Sinc-NLS
+
+ clear all; close all; 
+ En_fminunc = 0;
+ if En_fminunc = 2;
+% Generate noisy data (sine wave + noise)
+Fs = 1e3; % Sampling frequency (1 kHz)
+T = 1; % Duration of signal (1 second)
+t = 0:1/Fs:T-1/Fs; % Time vector
+true_peak_position = 0.5; % True peak at t = 0.5 seconds
+y = sin(2 * pi * 10 * t) + 0.1 * randn(size(t)); % Sine wave with noise
+
+% Approximate the peak position using Quadratic Least Squares (QLS)
+% Select a small window around the peak to fit a quadratic function
+window_size = 30; % Number of samples around the peak to use for fitting
+peak_index = round(length(t)/2); % Assume peak near the middle
+
+% Define a small window around the peak
+t_window = t(peak_index - window_size : peak_index + window_size);
+y_window = y(peak_index - window_size : peak_index + window_size);
+
+% Fit a quadratic function: y(t) = a * t^2 + b * t + c
+X = [t_window.^2, t_window, ones(size(t_window))]; % Design matrix
+params = (X' * X) \ (X' * y_window'); % Solve for coefficients [a; b; c]
+
+% Extract the coefficients
+a = params(1);
+b = params(2);
+c = params(3);
+
+% Calculate the peak position (vertex of the parabola)
+t_peak = -b / (2 * a); % Vertex formula for quadratic function
+
+% Plot the results
+figure;
+plot(t, y, 'k', 'LineWidth', 1.5);
+hold on;
+plot(t_window, X * params, 'r--', 'LineWidth', 2); % Plot the quadratic fit
+xlabel('Time (s)');
+ylabel('Amplitude');
+legend('Noisy Signal', 'Quadratic Fit');
+title(sprintf('Peak Detection: Estimated Peak at t = %.4f seconds', t_peak));
+grid on;
+ end
+
+
 % MATLAB code for High Precision Clock Synchronization using Sinc-NLS (without fminunc)
 clear all; close all; 
-En_fminunc = 0;
+
 if En_fminunc ==0 %  (without fminunc)
 % MATLAB code for High Precision Clock Synchronization using Sinc-NLS (without fminunc)
 % Step 1: Generate a simulated signal (ideal signal + noise)
